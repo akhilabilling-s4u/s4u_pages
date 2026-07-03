@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSS / VA DL - Day &amp; Time Picker</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <script src="common.js"></script>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --brand: #2563eb;
+      --brand-hover: #1d4ed8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Segoe UI, Calibri, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      padding: 12px;
+    }
+    .shell {
+      max-width: 460px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+    }
+    .header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #f8fbff;
+    }
+    .title { margin: 0; font-size: 16px; font-weight: 700; }
+    .subtitle { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .section { padding: 12px 14px; }
+    label { display: block; margin-bottom: 4px; font-size: 12px; font-weight: 600; }
+    .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    select {
+      width: 100%; padding: 9px 10px;
+      border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font-size: 13px;
+    }
+    button {
+      width: 100%; margin-top: 12px; border: 0; border-radius: 10px;
+      background: var(--brand); color: #fff;
+      padding: 11px 12px; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    button:hover { background: var(--brand-hover); }
+    .hint { font-size: 11px; color: var(--muted); margin-top: 8px; }
+    .result { margin-top: 10px; font-size: 12px; color: #374151; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="header">
+      <h3 class="title">CSS / VA DL</h3>
+      <p class="subtitle">Write "Mon, 09:00 AM" style values to the active cell.</p>
+    </div>
+    <div class="section">
+      <label for="day">Day</label>
+      <select id="day">
+        <option value="">--Select Day--</option>
+        <option value="Monday">Mon</option>
+        <option value="Tuesday">Tue</option>
+        <option value="Wednesday">Wed</option>
+        <option value="Thursday">Thu</option>
+        <option value="Friday">Fri</option>
+        <option value="Saturday">Sat</option>
+        <option value="Sunday">Sun</option>
+      </select>
+      <label style="margin-top:10px;">Time</label>
+      <div class="row">
+        <select id="hour"><option value="">Hour</option></select>
+        <select id="minute"><option value="">Min</option></select>
+        <select id="ampm">
+          <option value="">AM/PM</option>
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </select>
+      </div>
+      <button id="saveBtn">Submit</button>
+      <p id="result" class="result"></p>
+      <p class="hint">Click a target cell in the sheet first, then pick a day + time and click Submit.</p>
+    </div>
+  </div>
+
+  <script>
+    Office.onReady(() => {
+      const hour = document.getElementById("hour");
+      for (let i = 1; i <= 12; i++) {
+        const opt = document.createElement("option");
+        opt.value = String(i); opt.textContent = String(i);
+        hour.appendChild(opt);
+      }
+      const minute = document.getElementById("minute");
+      for (let i = 0; i < 60; i++) {
+        const v = i < 10 ? "0" + i : String(i);
+        const opt = document.createElement("option");
+        opt.value = v; opt.textContent = v;
+        minute.appendChild(opt);
+      }
+
+      document.getElementById("saveBtn").addEventListener("click", async () => {
+        const day = document.getElementById("day").value;
+        const h = document.getElementById("hour").value;
+        const m = document.getElementById("minute").value;
+        const ap = document.getElementById("ampm").value;
+        if (!day || !h || !m || !ap) { alert("Please select day and time."); return; }
+        try {
+          const out = await POD_BOOKING.saveDateTime(day, h, m, ap);
+          document.getElementById("result").textContent = "Cell now: " + out;
+        } catch (e) {
+          alert("Failed: " + e.message);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
+

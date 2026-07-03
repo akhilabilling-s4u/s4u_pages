@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Sheet — Fill Row</title>
+
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <script src="common.js"></script>
+
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --brand: #2563eb;
+      --brand-hover: #1d4ed8;
+      --success: #16a34a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Segoe UI, Calibri, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      padding: 12px;
+    }
+
+    .shell {
+      max-width: 460px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #f8fbff;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section:last-of-type {
+      border-bottom: 0;
+    }
+
+    .section h4 {
+      margin: 0 0 10px;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .field {
+      margin-bottom: 10px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    input[readonly] {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .footer {
+      padding: 12px 14px 14px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+      position: sticky;
+      bottom: 0;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      background: var(--brand);
+      color: #fff;
+      padding: 11px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--brand-hover);
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .toast {
+      display: none;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #ecfdf3;
+      color: var(--success);
+      font-size: 12px;
+      border: 1px solid #bbf7d0;
+      text-align: center;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .diag {
+      margin: 8px 0 0;
+      padding: 8px 10px;
+      border: 1px dashed #d1d5db;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 11px;
+      color: #374151;
+      max-height: 160px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .diag-toggle {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--brand);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <div class="header">
+      <h3 class="title">Fill Row</h3>
+      <p class="subtitle">Single-entry booking form (Excel Task Pane)</p>
+    </div>
+
+    <div class="section">
+      <h4>Assignment</h4>
+
+      <div class="field">
+        <label for="user">User</label>
+        <select id="user">
+          <option value="">Select User</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="client">Client</label>
+        <select id="client">
+          <option value="">Select Client</option>
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="clientCode">Client ID</label>
+          <input type="text" id="clientCode" readonly />
+        </div>
+
+        <div class="field">
+          <label for="pod">POD</label>
+          <input type="text" id="pod" readonly />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="sensitivity">Sensitivity</label>
+        <input type="text" id="sensitivity" readonly />
+      </div>
+    </div>
+
+    <div class="section">
+      <h4>Timing</h4>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="date">Date</label>
+          <input type="date" id="date" />
+        </div>
+
+        <div class="field">
+          <label for="inTime">In Time</label>
+          <input type="time" id="inTime" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="softwareId">Software ID</label>
+        <input type="text" id="softwareId" />
+      </div>
+    </div>
+
+    <div class="section">
+      <h4>Work Details</h4>
+
+      <div class="field">
+        <label for="projectCode">Charge Code</label>
+        <input type="text" id="projectCode" />
+      </div>
+
+      <div class="field">
+        <label for="jobDescription">Job Description</label>
+        <input type="text" id="jobDescription" />
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="newValue">New</label>
+          <input type="text" id="newValue" />
+        </div>
+
+        <div class="field">
+          <label for="edits">Edits</label>
+          <input type="text" id="edits" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="rework">Formatting</label>
+        <input type="text" id="rework" />
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="cssDl">CSS DL (IST)</label>
+          <input type="text" id="cssDl" value="TBC" readonly />
+        </div>
+
+        <div class="field">
+          <label for="vaDl">VA DL (IST)</label>
+          <input type="text" id="vaDl" value="TBC" readonly />
+        </div>
+      </div>
+
+      <div class="hint">
+        Dropdown values are loaded from the local <b>Database</b> sheet mirror.
+      </div>
+    </div>
+
+    <div class="footer">
+      <button id="submitBtn">Submit</button>
+
+      <div id="toast" class="toast">Row added successfully.</div>
+
+      <span id="diagToggle" class="diag-toggle">Show diagnostics</span>
+      <pre id="diag" class="diag" style="display:none;"></pre>
+    </div>
+
+  </div>
+
+  <script>
+    const userSelect = document.getElementById("user");
+    const clientSelect = document.getElementById("client");
+    const submitBtn = document.getElementById("submitBtn");
+    const toast = document.getElementById("toast");
+    const diagEl = document.getElementById("diag");
+    const diagToggle = document.getElementById("diagToggle");
+
+    let lastPodFilter = "";
+
+    function resetToast() {
+      toast.style.display = "none";
+      toast.textContent = "Row added successfully.";
+    }
+
+    diagToggle.addEventListener("click", async () => {
+      if (diagEl.style.display === "none") {
+        try {
+          const info = await POD_BOOKING.diagnose();
+          info.detectedPodFilter = lastPodFilter;
+          diagEl.textContent = JSON.stringify(info, null, 2);
+        } catch (e) {
+          diagEl.textContent = "diagnose() failed: " + e.message;
+        }
+
+        diagEl.style.display = "block";
+        diagToggle.textContent = "Hide diagnostics";
+      } else {
+        diagEl.style.display = "none";
+        diagToggle.textContent = "Show diagnostics";
+      }
+    });
+
+    Office.onReady(async () => {
+      let podFilter = "";
+
+      try {
+        await Excel.run(async (ctx) => {
+          const s = ctx.workbook.worksheets.getActiveWorksheet();
+          s.load("name");
+          await ctx.sync();
+
+          const m = s.name.match(/POD[-_ ]?(.+)/i);
+          if (m) podFilter = m[1].trim();
+        });
+      } catch (e) {}
+
+      lastPodFilter = podFilter;
+
+      const data = await POD_BOOKING.getDropdownData(podFilter);
+
+      userSelect.innerHTML = '<option value="">Select User</option>';
+      data.users.forEach((u) => {
+        const opt = document.createElement("option");
+        opt.value = u;
+        opt.textContent = u;
+        userSelect.appendChild(opt);
+      });
+    });
+
+    userSelect.addEventListener("change", async function () {
+      resetToast();
+
+      const user = this.value;
+      document.getElementById("sensitivity").value =
+        user ? await POD_BOOKING.getSensitivity(user) : "";
+
+      const clients = user
+        ? await POD_BOOKING.getClientsBasedOnUser(user)
+        : [];
+
+      clientSelect.innerHTML = '<option value="">Select Client</option>';
+
+      clients.forEach((c) => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        clientSelect.appendChild(opt);
+      });
+
+      document.getElementById("clientCode").value = "";
+      document.getElementById("pod").value = "";
+    });
+
+    clientSelect.addEventListener("change", async function () {
+      resetToast();
+
+      if (!this.value) {
+        document.getElementById("clientCode").value = "";
+        document.getElementById("pod").value = "";
+        return;
+      }
+
+      const d = await POD_BOOKING.getClientDetails(this.value);
+      document.getElementById("clientCode").value = d.clientId;
+      document.getElementById("pod").value = d.pod;
+    });
+
+    submitBtn.addEventListener("click", async () => {
+      resetToast();
+
+      const formData = {
+        date: document.getElementById("date").value,
+        softwareId: document.getElementById("softwareId").value,
+        inTime: document.getElementById("inTime").value,
+        client: clientSelect.value,
+        user: userSelect.value,
+        clientCode: document.getElementById("clientCode").value,
+        pod: document.getElementById("pod").value,
+        sensitivity: document.getElementById("sensitivity").value,
+        projectCode: document.getElementById("projectCode").value,
+        jobDescription: document.getElementById("jobDescription").value,
+        newValue: document.getElementById("newValue").value,
+        edits: document.getElementById("edits").value,
+        rework: document.getElementById("rework").value,
+        cssDl: "TBC",
+        vaDl: "TBC"
+      };
+
+      if (!formData.user || !formData.client || !formData.date || !formData.inTime) {
+        alert("Please select User, Client, Date and In Time before submit.");
+        return;
+      }
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+
+        await POD_BOOKING.submitForm(formData);
+
+        toast.style.display = "block";
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 2200);
+
+      } catch (err) {
+        alert("Failed to submit row: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit";
+      }
+    });
+  </script>
+
+</body>
+</html>
