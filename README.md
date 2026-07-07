@@ -210,7 +210,7 @@ S4U Reconcile New Clients
 4. Run every:
 
 ```text
-15 minutes
+1 minutes
 ```
 
 ---
