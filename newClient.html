@@ -1,440 +1,411 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Client DB - New Client</title>
-
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     <script src="common.js"></script>
-
     <style>
-        :root {
-            --bg: #f5f7fb;
-            --card: #ffffff;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --line: #e5e7eb;
-            --brand: #2563eb;
-            --brand-hover: #1d4ed8;
-            --success: #16a34a;
-            --warn-bg: #fffbeb;
-            --warn-fg: #92400e;
-            --warn-line: #fde68a;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            padding: 12px;
-            overflow-y: auto;
-            font-family: Segoe UI, Calibri, sans-serif;
-            color: var(--text);
-            background: var(--bg);
-        }
-
-        .shell {
-            max-width: 460px;
-            margin: 0 auto;
-            overflow: hidden;
-            background: var(--card);
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-        }
-
-        .header {
-            padding: 14px 16px;
-            background: #f8fbff;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .title {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .subtitle {
-            margin: 4px 0 0;
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .section {
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .section:last-of-type {
-            border-bottom: 0;
-        }
-
-        .section h4 {
-            margin: 0 0 10px;
-            font-size: 12px;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .field {
-            margin-bottom: 10px;
-        }
-
-        .field:last-child {
-            margin-bottom: 0;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 9px 10px;
-            font-size: 13px;
-            background: #fff;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-        }
-
-        input[readonly] {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
-        .actions {
-            margin-top: 10px;
-            display: grid;
-            gap: 8px;
-        }
-
-        button {
-            width: 100%;
-            padding: 11px 12px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #fff;
-            cursor: pointer;
-            background: var(--brand);
-            border: 0;
-            border-radius: 10px;
-        }
-
-        button:hover {
-            background: var(--brand-hover);
-        }
-
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .hint {
-            margin-top: 6px;
-            font-size: 11px;
-            color: var(--muted);
-        }
-
-        .toast {
-            display: none;
-            margin-top: 8px;
-            padding: 8px 10px;
-            font-size: 12px;
-            text-align: center;
-            color: var(--success);
-            background: #ecfdf3;
-            border: 1px solid #bbf7d0;
-            border-radius: 8px;
-        }
-
-        .banner {
-            margin: 8px 14px 0;
-            padding: 8px 10px;
-            font-size: 12px;
-            border-radius: 8px;
-            color: var(--warn-fg);
-            background: var(--warn-bg);
-            border: 1px solid var(--warn-line);
-        }
-
-        .banner.error {
-            color: #991b1b;
-            background: #fef2f2;
-            border-color: #fecaca;
-        }
+      :root {
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --brand: #2563eb;
+        --brand-hover: #1d4ed8;
+        --success: #16a34a;
+        --warn-bg: #fffbeb;
+        --warn-fg: #92400e;
+        --warn-line: #fde68a;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Segoe UI, Calibri, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        padding: 12px;
+        overflow-y: auto;
+      }
+      .shell {
+        max-width: 460px;
+        margin: 0 auto;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+      }
+      .header {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: #f8fbff;
+      }
+      .title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .subtitle {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .section {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .section:last-of-type {
+        border-bottom: 0;
+      }
+      .section h4 {
+        margin: 0 0 10px;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .field {
+        margin-bottom: 10px;
+      }
+      .field:last-child {
+        margin-bottom: 0;
+      }
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 9px 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #fff;
+        font-size: 13px;
+      }
+      input[readonly] {
+        background: #f3f4f6;
+        color: #374151;
+      }
+      .actions {
+        margin-top: 10px;
+        display: grid;
+        gap: 8px;
+      }
+      button {
+        width: 100%;
+        border: 0;
+        border-radius: 10px;
+        background: var(--brand);
+        color: #fff;
+        padding: 11px 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:hover {
+        background: var(--brand-hover);
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .hint {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .toast {
+        display: none;
+        margin-top: 8px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: #ecfdf3;
+        color: var(--success);
+        font-size: 12px;
+        border: 1px solid #bbf7d0;
+        text-align: center;
+      }
+      .banner {
+        margin: 8px 14px 0;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: var(--warn-bg);
+        color: var(--warn-fg);
+        font-size: 12px;
+        border: 1px solid var(--warn-line);
+      }
+      .banner.error {
+        background: #fef2f2;
+        color: #991b1b;
+        border-color: #fecaca;
+      }
     </style>
-</head>
-
-<body>
+  </head>
+  <body>
     <div class="shell">
+      <div class="header">
+        <h3 class="title">New Client</h3>
+        <p class="subtitle">
+          Queue a new client. A scheduled job sends it to S4U Client DB.
+        </p>
+      </div>
 
-        <div class="header">
-            <h3 class="title">New Client</h3>
-            <p class="subtitle">
-                Queue a new client. A scheduled job sends it to S4U Client DB.
-            </p>
+      <div id="ctxBanner" class="banner" style="display: none"></div>
+
+      <div id="formBody">
+        <div class="section">
+          <h4>Existing Client - New User</h4>
+          <div class="field">
+            <label for="existing_clientName">Client</label>
+            <select id="existing_clientName">
+              <option value="">Loading clients...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="existing_userName">User</label>
+            <input
+              type="text"
+              id="existing_userName"
+              placeholder="New user name"
+            />
+          </div>
+          <div class="field">
+            <label for="existing_pod">POD</label>
+            <input type="text" id="existing_pod" readonly />
+          </div>
+          <div class="actions">
+            <button id="existingSubmit" disabled>
+              Add User to Existing Client
+            </button>
+          </div>
         </div>
 
-        <div id="ctxBanner" class="banner" style="display:none;"></div>
-
-        <div id="formBody">
-
-            <!-- Existing Client -->
-            <div class="section">
-                <h4>Existing Client - New User</h4>
-
-                <div class="field">
-                    <label for="existing_clientName">Client</label>
-                    <select id="existing_clientName">
-                        <option value="">Loading clients...</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label for="existing_userName">User</label>
-                    <input type="text" id="existing_userName" placeholder="New user name" />
-                </div>
-
-                <div class="field">
-                    <label for="existing_pod">POD</label>
-                    <input type="text" id="existing_pod" readonly />
-                </div>
-
-                <div class="actions">
-                    <button id="existingSubmit" disabled>
-                        Add User to Existing Client
-                    </button>
-                </div>
-            </div>
-
-            <!-- New Client -->
-            <div class="section">
-                <h4>Brand New Client</h4>
-
-                <div class="field">
-                    <label for="new_clientName">Client</label>
-                    <input type="text" id="new_clientName" placeholder="New client name" />
-                </div>
-
-                <div class="field">
-                    <label for="new_userName">User</label>
-                    <input type="text" id="new_userName" placeholder="User name" />
-                </div>
-
-                <div class="field">
-                    <label for="new_pod">POD</label>
-                    <select id="new_pod">
-                        <option value="">Select POD</option>
-                    </select>
-                </div>
-
-                <div class="actions">
-                    <button id="newSubmit" disabled>
-                        Add New Client
-                    </button>
-                </div>
-
-                <div class="hint">
-                    Defaults applied: <b>Sensitivity = High</b>,
-                    <b>Reviewing = INC</b>,
-                    <b>Client Code = blank</b>.
-                </div>
-
-                <div id="toast" class="toast">
-                    Queued. Will appear after reconcile + Refresh All.
-                </div>
-            </div>
-
+        <div class="section">
+          <h4>Brand New Client</h4>
+          <div class="field">
+            <label for="new_clientName">Client</label>
+            <input
+              type="text"
+              id="new_clientName"
+              placeholder="New client name"
+            />
+          </div>
+          <div class="field">
+            <label for="new_userName">User</label>
+            <input type="text" id="new_userName" placeholder="User name" />
+          </div>
+          <div class="field">
+            <label for="new_pod">POD</label>
+            <select id="new_pod">
+              <option value="">Select POD</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button id="newSubmit" disabled>Add New Client</button>
+          </div>
+          <div class="hint">
+            Defaults applied: <b>Sensitivity = High</b>, <b>Reviewing = INC</b>,
+            <b>Client Code = blank</b>.
+          </div>
+          <div id="toast" class="toast">
+            Queued. Will appear after reconcile + Refresh All.
+          </div>
         </div>
+      </div>
     </div>
 
     <script>
-        const banner = document.getElementById("ctxBanner");
-        const existingClientSelect = document.getElementById("existing_clientName");
-        const existingPodField = document.getElementById("existing_pod");
-        const newPodSelect = document.getElementById("new_pod");
-        const existingSubmit = document.getElementById("existingSubmit");
-        const newSubmit = document.getElementById("newSubmit");
-        const toast = document.getElementById("toast");
+      const banner = document.getElementById("ctxBanner");
+      const existingClientSelect = document.getElementById(
+        "existing_clientName"
+      );
+      const existingPodField = document.getElementById("existing_pod");
+      const newPodSelect = document.getElementById("new_pod");
+      const existingSubmit = document.getElementById("existingSubmit");
+      const newSubmit = document.getElementById("newSubmit");
+      const toast = document.getElementById("toast");
 
-        function showBanner(msg, kind) {
-            banner.textContent = msg;
-            banner.classList.toggle("error", kind === "error");
-            banner.style.display = "block";
+      function showBanner(msg, kind) {
+        banner.textContent = msg;
+        banner.classList.toggle("error", kind === "error");
+        banner.style.display = "block";
+      }
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.style.display = "block";
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 3000);
+      }
+
+      function whenExcelReady(cb, attempt) {
+        attempt = attempt || 0;
+        if (
+          typeof Excel !== "undefined" &&
+          Excel &&
+          typeof Excel.run === "function"
+        ) {
+          cb();
+          return;
         }
-
-        function showToast(msg) {
-            toast.textContent = msg;
-            toast.style.display = "block";
-            setTimeout(() => {
-                toast.style.display = "none";
-            }, 3000);
+        if (attempt > 40) {
+          showBanner(
+            "This task pane must be opened inside Microsoft Excel.",
+            "error"
+          );
+          document.getElementById("formBody").style.display = "none";
+          return;
         }
+        setTimeout(function () {
+          whenExcelReady(cb, attempt + 1);
+        }, 250);
+      }
 
-        function whenExcelReady(cb, attempt) {
-            attempt = attempt || 0;
-
-            if (typeof Excel !== "undefined" && Excel && typeof Excel.run === "function") {
-                cb();
-                return;
+      function initForm() {
+        // Load Client + POD pairs from the LOCAL Database mirror (Power Query
+        // result). This works inside any POD workbook.
+        POD_BOOKING.getClientListWithPOD()
+          .then((list) => {
+            if (!list || !list.length) {
+              showBanner(
+                "No clients found. Make sure the Database sheet (Power Query mirror " +
+                  "of tbl_Database) exists in this POD workbook and has been refreshed.",
+                "error"
+              );
+              return;
             }
 
-            if (attempt > 40) {
-                showBanner("This task pane must be opened inside Microsoft Excel.", "error");
-                document.getElementById("formBody").style.display = "none";
-                return;
-            }
+            existingClientSelect.innerHTML =
+              '<option value="">Select Client</option>';
+            list.sort((a, b) => a.client.localeCompare(b.client));
+            list.forEach((item) => {
+              const opt = document.createElement("option");
+              opt.value = item.client;
+              opt.textContent = item.client;
+              opt.dataset.pod = item.pod;
+              existingClientSelect.appendChild(opt);
+            });
+            existingClientSelect.addEventListener("change", () => {
+              const sel =
+                existingClientSelect.options[
+                  existingClientSelect.selectedIndex
+                ];
+              existingPodField.value = (sel && sel.dataset.pod) || "";
+            });
 
-            setTimeout(function () {
-                whenExcelReady(cb, attempt + 1);
-            }, 250);
-        }
+            const pods = Array.from(
+              new Set(list.map((i) => i.pod).filter(Boolean))
+            ).sort();
+            newPodSelect.innerHTML = '<option value="">Select POD</option>';
+            const podOptions = pods.length
+              ? pods
+              : ["POD A", "POD B", "POD RoW"];
+            podOptions.forEach((p) => {
+              const opt = document.createElement("option");
+              opt.value = p;
+              opt.textContent = p;
+              newPodSelect.appendChild(opt);
+            });
 
-        function initForm() {
-            POD_BOOKING.getClientListWithPOD()
-                .then((list) => {
+            existingSubmit.disabled = false;
+            newSubmit.disabled = false;
+          })
+          .catch((e) => {
+            showBanner(
+              "Failed to load clients: " + (e && e.message ? e.message : e),
+              "error"
+            );
+          });
+      }
 
-                    if (!list || !list.length) {
-                        showBanner(
-                            "No clients found. Make sure the Database sheet exists and is refreshed.",
-                            "error"
-                        );
-                        return;
-                    }
-
-                    existingClientSelect.innerHTML =
-                        '<option value="">Select Client</option>';
-
-                    list.sort((a, b) =>
-                        a.client.localeCompare(b.client)
-                    );
-
-                    list.forEach((item) => {
-                        const opt = document.createElement("option");
-                        opt.value = item.client;
-                        opt.textContent = item.client;
-                        opt.dataset.pod = item.pod;
-                        existingClientSelect.appendChild(opt);
-                    });
-
-                    existingClientSelect.addEventListener("change", () => {
-                        const sel =
-                            existingClientSelect.options[
-                                existingClientSelect.selectedIndex
-                            ];
-
-                        existingPodField.value =
-                            (sel && sel.dataset.pod) || "";
-                    });
-
-                    const pods = Array.from(
-                        new Set(list.map((i) => i.pod).filter(Boolean))
-                    ).sort();
-
-                    newPodSelect.innerHTML =
-                        '<option value="">Select POD</option>';
-
-                    const podOptions =
-                        pods.length ? pods : ["POD A", "POD B", "POD RoW"];
-
-                    podOptions.forEach((p) => {
-                        const opt = document.createElement("option");
-                        opt.value = p;
-                        opt.textContent = p;
-                        newPodSelect.appendChild(opt);
-                    });
-
-                    existingSubmit.disabled = false;
-                    newSubmit.disabled = false;
-                })
-                .catch((e) => {
-                    showBanner("Failed to load clients: " + e.message, "error");
-                });
-        }
-
+      if (typeof Office === "undefined") {
+        showBanner(
+          "Office.js failed to load. Open this pane from inside Excel.",
+          "error"
+        );
+        document.getElementById("formBody").style.display = "none";
+      } else {
         Office.onReady(function (info) {
-            if (info.host !== Office.HostType.Excel) {
-                showBanner("This pane runs only inside Excel.", "error");
+          if (info && info.host && info.host !== Office.HostType.Excel) {
+            showBanner("This pane runs only inside Excel.", "error");
+            document.getElementById("formBody").style.display = "none";
+            return;
+          }
+          whenExcelReady(function () {
+            POD_BOOKING.isPodWorkbook().then(function (guard) {
+              if (!guard.ok) {
+                showBanner(
+                  "New Client is available only inside POD workbooks (POD A / POD B / POD RoW). " +
+                    "Current workbook: " +
+                    (guard.name || "(unknown)") +
+                    ".",
+                  "error"
+                );
                 document.getElementById("formBody").style.display = "none";
                 return;
-            }
-
-            whenExcelReady(initForm);
+              }
+              initForm();
+            });
+          });
         });
+      }
 
-        async function submit(formId) {
-            const clientName =
-                document.getElementById(formId + "_clientName").value;
+      async function submit(formId) {
+        const clientName = document.getElementById(
+          formId + "_clientName"
+        ).value;
+        const userName = document.getElementById(formId + "_userName").value;
+        const pod =
+          (document.getElementById(formId + "_pod") || {}).value || "";
 
-            const userName =
-                document.getElementById(formId + "_userName").value;
-
-            const pod =
-                document.getElementById(formId + "_pod")?.value || "";
-
-            if (!clientName || !userName) {
-                alert("Please fill Client and User.");
-                return;
-            }
-
-            if (formId === "new" && !pod) {
-                alert("Please select a POD.");
-                return;
-            }
-
-            const btn =
-                formId === "existing"
-                    ? existingSubmit
-                    : newSubmit;
-
-            const label = btn.textContent;
-
-            btn.disabled = true;
-            btn.textContent = "Queueing...";
-
-            try {
-                await POD_BOOKING.saveNewClient({
-                    clientName: clientName.trim(),
-                    userName: userName.trim(),
-                    pod: pod.trim(),
-                    sensitivity: "High",
-                    reviewing: "INC"
-                });
-
-                showToast(
-                    formId === "existing"
-                        ? "Queued: user added to " + clientName + "."
-                        : "Queued: client " + clientName + " added."
-                );
-
-                document.getElementById(formId + "_userName").value = "";
-
-                if (formId === "new") {
-                    document.getElementById("new_clientName").value = "";
-                }
-
-            } catch (e) {
-                alert("Failed to queue row: " + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = label;
-            }
+        if (!clientName || !userName) {
+          alert("Please fill Client and User.");
+          return;
+        }
+        if (formId === "new" && !pod) {
+          alert("Please select a POD.");
+          return;
         }
 
-        existingSubmit.addEventListener("click", () => submit("existing"));
-        newSubmit.addEventListener("click", () => submit("new"));
-    </script>
+        const btn = formId === "existing" ? existingSubmit : newSubmit;
+        const label = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "Queueing...";
+        try {
+          await POD_BOOKING.saveNewClient({
+            clientName: clientName.trim(),
+            userName: userName.trim(),
+            pod: pod.trim(),
+            sensitivity: "High",
+            reviewing: "INC",
+          });
+          showToast(
+            formId === "existing"
+              ? "Queued: user added to " + clientName + "."
+              : "Queued: client " + clientName + " added."
+          );
+          document.getElementById(formId + "_userName").value = "";
+          if (formId === "new") {
+            document.getElementById("new_clientName").value = "";
+          }
+        } catch (e) {
+          alert("Failed to queue row: " + e.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = label;
+        }
+      }
 
-</body>
+      existingSubmit.addEventListener("click", () => submit("existing"));
+      newSubmit.addEventListener("click", () => submit("new"));
+    </script>
+  </body>
 </html>

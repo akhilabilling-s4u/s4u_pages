@@ -1,91 +1,166 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Time Picker - In Time</title>
-  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-  <script src="common.js"></script>
-  <style>
-    :root {
-      --bg: #f5f7fb;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --line: #e5e7eb;
-      --brand: #2563eb;
-      --brand-hover: #1d4ed8;
-      --success: #16a34a;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Segoe UI, Calibri, sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      padding: 12px;
-    }
-    .shell {
-      max-width: 460px;
-      margin: 0 auto;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-      overflow: hidden;
-    }
-    .header {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--line);
-      background: #f8fbff;
-    }
-    .title { margin: 0; font-size: 16px; font-weight: 700; }
-    .subtitle { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
-    .section { padding: 12px 14px; }
-    label { display: block; margin-bottom: 4px; font-size: 12px; font-weight: 600; }
-    input[type="time"] {
-      width: 100%; padding: 9px 10px;
-      border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font-size: 13px;
-    }
-    button {
-      width: 100%; margin-top: 10px; border: 0; border-radius: 10px;
-      background: var(--brand); color: #fff;
-      padding: 11px 12px; font-size: 14px; font-weight: 600; cursor: pointer;
-    }
-    button:hover { background: var(--brand-hover); }
-    .result { margin-top: 10px; font-size: 12px; color: #374151; }
-    .hint { font-size: 11px; color: var(--muted); margin-top: 8px; }
-  </style>
-</head>
-<body>
-  <div class="shell">
-    <div class="header">
-      <h3 class="title">In Time</h3>
-      <p class="subtitle">Append HH:MM history to the active cell.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Time Picker - In Time</title>
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script src="common.js"></script>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --card: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --brand: #2563eb;
+        --brand-hover: #1d4ed8;
+        --success: #16a34a;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Segoe UI, Calibri, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        padding: 12px;
+      }
+      .shell {
+        max-width: 460px;
+        margin: 0 auto;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+      }
+      .header {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: #f8fbff;
+      }
+      .title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .subtitle {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .section {
+        padding: 12px 14px;
+      }
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      input[type="time"] {
+        width: 100%;
+        padding: 9px 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #fff;
+        font-size: 13px;
+      }
+      button {
+        width: 100%;
+        margin-top: 10px;
+        border: 0;
+        border-radius: 10px;
+        background: var(--brand);
+        color: #fff;
+        padding: 11px 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:hover {
+        background: var(--brand-hover);
+      }
+      .result {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #374151;
+      }
+      .hint {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .guard {
+        margin: 12px 14px;
+        padding: 10px 12px;
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="header">
+        <h3 class="title">In Time</h3>
+        <p class="subtitle">Append HH:MM history to the active cell.</p>
+      </div>
+      <div id="guardBanner" class="guard" style="display: none"></div>
+      <div id="formBody">
+        <div class="section">
+          <label for="time">Time</label>
+          <input type="time" id="time" />
+          <button id="addBtn">Add Time</button>
+          <p id="result" class="result"></p>
+          <p class="hint">
+            Click a target cell in the sheet first, then pick a time and click
+            Add Time. Existing HH:MM values in the cell are preserved as slash
+            history.
+          </p>
+        </div>
+      </div>
     </div>
-    <div class="section">
-      <label for="time">Time</label>
-      <input type="time" id="time" />
-      <button id="addBtn">Add Time</button>
-      <p id="result" class="result"></p>
-      <p class="hint">Click a target cell in the sheet first, then pick a time and click Add Time. Existing HH:MM values in the cell are preserved as slash history.</p>
-    </div>
-  </div>
 
-  <script>
-    Office.onReady(() => {
-      document.getElementById("addBtn").addEventListener("click", async () => {
-        const value = document.getElementById("time").value;
-        if (!value) return;
-        try {
-          const final = await POD_BOOKING.appendTime(value);
-          document.getElementById("result").textContent = "Cell now: " + final;
-        } catch (e) {
-          alert("Failed: " + e.message);
+    <script>
+      function showGuard(name) {
+        const banner = document.getElementById("guardBanner");
+        banner.innerHTML =
+          "<b>In Time is available only inside POD workbooks.</b><br>" +
+          "Current workbook: <code>" +
+          (name || "(unknown)") +
+          "</code>.<br>" +
+          "Open <b>POD A</b>, <b>POD B</b>, or <b>POD RoW</b> to use this feature.";
+        banner.style.display = "block";
+        document.getElementById("formBody").style.display = "none";
+      }
+
+      Office.onReady(async () => {
+        const guard = await POD_BOOKING.isPodWorkbook();
+        if (!guard.ok) {
+          showGuard(guard.name);
+          return;
         }
+
+        document
+          .getElementById("addBtn")
+          .addEventListener("click", async () => {
+            const value = document.getElementById("time").value;
+            if (!value) return;
+            try {
+              const final = await POD_BOOKING.appendTime(value);
+              document.getElementById("result").textContent =
+                "Cell now: " + final;
+            } catch (e) {
+              alert("Failed: " + e.message);
+            }
+          });
       });
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
