@@ -439,18 +439,44 @@
         try {
           submitBtn.disabled = true;
           submitBtn.textContent = "Submitting...";
-          await POD_BOOKING.submitForm(formData);
-          toast.style.display = "block";
-          setTimeout(() => {
-            toast.style.display = "none";
-          }, 2200);
+          const res = await POD_BOOKING.submitForm(formData);
+          POD_BOOKING.showPopup(
+            "Booking row added successfully (row " +
+              (res && res.row ? res.row : "") +
+              ")."
+          );
+          clearForm();
         } catch (err) {
-          alert("Failed to submit row: " + err.message);
+          POD_BOOKING.showPopup(
+            "Failed to submit row: " + err.message,
+            "error"
+          );
         } finally {
           submitBtn.disabled = false;
           submitBtn.textContent = "Submit";
         }
       });
+
+      function clearForm() {
+        userSelect.value = "";
+        clientSelect.innerHTML = '<option value="">Select Client</option>';
+        [
+          "clientCode",
+          "pod",
+          "sensitivity",
+          "date",
+          "inTime",
+          "softwareId",
+          "projectCode",
+          "jobDescription",
+          "newValue",
+          "edits",
+          "rework",
+        ].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.value = "";
+        });
+      }
     </script>
   </body>
 </html>

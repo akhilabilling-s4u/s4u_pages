@@ -147,6 +147,45 @@
         color: #991b1b;
         border-color: #fecaca;
       }
+      .syncbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--line);
+        background: #f8fbff;
+      }
+      .syncbar .stats {
+        flex: 1;
+        font-size: 12px;
+        color: #374151;
+      }
+      .syncbar .stats b {
+        font-weight: 700;
+      }
+      .syncbar .pending {
+        color: #a16207;
+      }
+      .syncbar .done {
+        color: #16a34a;
+      }
+      .syncbar .err {
+        color: #991b1b;
+      }
+      .syncbar button {
+        width: auto;
+        padding: 7px 14px;
+        font-size: 12px;
+        border-radius: 8px;
+      }
+      .syncbar button.secondary {
+        background: #fff;
+        color: var(--brand);
+        border: 1px solid var(--brand);
+      }
+      .syncbar button.secondary:hover {
+        background: #eff6ff;
+      }
     </style>
   </head>
   <body>
@@ -159,6 +198,23 @@
       </div>
 
       <div id="ctxBanner" class="banner" style="display: none"></div>
+
+      <div id="syncBar" class="syncbar" style="display: none">
+        <div class="stats">
+          <span class="pending"><b id="stat_pending">0</b> pending</span>
+          &nbsp;&middot;&nbsp;
+          <span class="done"><b id="stat_done">0</b> done</span>
+          &nbsp;&middot;&nbsp;
+          <span class="err"><b id="stat_err">0</b> err</span>
+        </div>
+        <button
+          id="syncBtn"
+          class="secondary"
+          title="Trigger Power Automate reconcile flow"
+        >
+          Sync
+        </button>
+      </div>
 
       <div id="formBody">
         <div class="section">
@@ -223,7 +279,21 @@
     </div>
 
     <script>
+      // ==========================================================
+      // ADMIN: paste your Power Automate flow's Run URL here.
+      // How to get it:
+      //   1. Go to make.powerautomate.com > My flows
+      //   2. Open "S4U Reconcile New Clients"
+      //   3. Copy the URL from the browser address bar
+      //   4. Replace PASTE_YOUR_FLOW_URL_HERE below, keeping the quotes.
+      // Leave as-is to disable the Sync button.
+      // ==========================================================
+      const FLOW_URL = "PASTE_YOUR_FLOW_URL_HERE";
+      // ==========================================================
+
       const banner = document.getElementById("ctxBanner");
+      const syncBar = document.getElementById("syncBar");
+      const syncBtn = document.getElementById("syncBtn");
       const existingClientSelect = document.getElementById(
         "existing_clientName"
       );
@@ -232,6 +302,47 @@
       const existingSubmit = document.getElementById("existingSubmit");
       const newSubmit = document.getElementById("newSubmit");
       const toast = document.getElementById("toast");
+
+      const FLOW_URL_OK =
+        FLOW_URL &&
+        FLOW_URL.indexOf("PASTE_YOUR_FLOW_URL_HERE") === -1 &&
+        /^https:\/\//i.test(FLOW_URL);
+
+      async function refreshQueueStats() {
+        try {
+          const s = await POD_BOOKING.getQueueStatus();
+          document.getElementById("stat_pending").textContent =
+            (s && s.pending) || 0;
+          document.getElementById("stat_done").textContent =
+            (s && s.processed) || 0;
+          document.getElementById("stat_err").textContent = (s && s.error) || 0;
+        } catch (e) {
+          /* silent - queue table may not exist yet */
+        }
+      }
+
+      function initSyncBar() {
+        syncBar.style.display = "flex";
+        if (!FLOW_URL_OK) {
+          syncBtn.disabled = true;
+          syncBtn.title =
+            "Flow URL not configured in newClient.html - ask an admin.";
+        }
+        syncBtn.addEventListener("click", () => {
+          if (!FLOW_URL_OK) {
+            alert(
+              "Sync is not configured. An admin must set FLOW_URL in newClient.html."
+            );
+            return;
+          }
+          try {
+            window.open(FLOW_URL, "_blank", "noopener,noreferrer");
+          } catch (e) {
+            alert("Could not open browser. URL: " + FLOW_URL);
+          }
+        });
+        refreshQueueStats();
+      }
 
       function showBanner(msg, kind) {
         banner.textContent = msg;
@@ -277,7 +388,7 @@
             if (!list || !list.length) {
               showBanner(
                 "No clients found. Make sure the Database sheet (Power Query mirror " +
-                  "of tbl_Database) exists in this POD workbook and has been refreshed.",
+                  "of Database) exists in this POD workbook and has been refreshed.",
                 "error"
               );
               return;
@@ -352,6 +463,7 @@
                 document.getElementById("formBody").style.display = "none";
                 return;
               }
+              initSyncBar();
               initForm();
             });
           });
@@ -387,17 +499,27 @@
             sensitivity: "High",
             reviewing: "INC",
           });
-          showToast(
+          POD_BOOKING.showPopup(
             formId === "existing"
-              ? "Queued: user added to " + clientName + "."
-              : "Queued: client " + clientName + " added."
+              ? "Queued: user added to " +
+                  clientName +
+                  ". It will sync to the master on the next reconcile."
+              : "Queued: client " +
+                  clientName +
+                  " added. It will sync to the master on the next reconcile."
           );
           document.getElementById(formId + "_userName").value = "";
+          if (formId === "existing") {
+            existingClientSelect.value = "";
+            existingPodField.value = "";
+          }
           if (formId === "new") {
             document.getElementById("new_clientName").value = "";
+            newPodSelect.value = "";
           }
+          refreshQueueStats();
         } catch (e) {
-          alert("Failed to queue row: " + e.message);
+          POD_BOOKING.showPopup("Failed to queue row: " + e.message, "error");
         } finally {
           btn.disabled = false;
           btn.textContent = label;

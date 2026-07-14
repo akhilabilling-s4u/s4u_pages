@@ -206,8 +206,13 @@
               const out = await POD_BOOKING.saveDateTime(day, h, m, ap);
               document.getElementById("result").textContent =
                 "Cell now: " + out;
+              POD_BOOKING.showPopup("Saved. Cell now: " + out + ".");
+              document.getElementById("day").value = "";
+              document.getElementById("hour").value = "";
+              document.getElementById("minute").value = "";
+              document.getElementById("ampm").value = "";
             } catch (e) {
-              alert("Failed: " + e.message);
+              POD_BOOKING.showPopup("Failed: " + e.message, "error");
             }
           });
       });

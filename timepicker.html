@@ -156,8 +156,10 @@
               const final = await POD_BOOKING.appendTime(value);
               document.getElementById("result").textContent =
                 "Cell now: " + final;
+              POD_BOOKING.showPopup("Time added. Cell now: " + final + ".");
+              document.getElementById("time").value = "";
             } catch (e) {
-              alert("Failed: " + e.message);
+              POD_BOOKING.showPopup("Failed: " + e.message, "error");
             }
           });
       });

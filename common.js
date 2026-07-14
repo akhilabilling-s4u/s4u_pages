@@ -10,7 +10,7 @@
 
 const POD_BOOKING = (function () {
   const DB_SHEET_NAME = "Database";
-  const DB_TABLE_NAME = "tbl_Database"; // exists only in the master S4U CLIENT DB workbook
+  const DB_TABLE_NAME = "Database"; // exists only in the master S4U CLIENT DB workbook
   const DEFAULT_COLS = {
     user: 0,
     client: 1,
@@ -116,9 +116,9 @@ const POD_BOOKING = (function () {
 
   /**
    * Detect the workbook role:
-   *   - "master" if the workbook contains an Excel Table named tbl_Database
+   *   - "master" if the workbook contains an Excel Table named Database
    *               (this is the S4U CLIENT DB workbook).
-   *   - "pod"    if it has a Database sheet but no tbl_Database table.
+   *   - "pod"    if it has a Database sheet but no Database table.
    *   - "unknown" otherwise.
    */
   async function getWorkbookContext() {
@@ -386,6 +386,66 @@ const POD_BOOKING = (function () {
     return table;
   }
 
+  /**
+   * Read the local queue and summarise its rows for the Sync Now pane:
+   *   { pending, processed, skipped, error, total, lastQueuedAt, lastProcessedAt, exists }
+   */
+  async function getQueueStatus() {
+    return Excel.run(async (ctx) => {
+      const wb = ctx.workbook;
+      const table = wb.tables.getItemOrNullObject(QUEUE_TABLE_NAME);
+      table.load("name");
+      await ctx.sync();
+
+      const empty = {
+        exists: false,
+        total: 0,
+        pending: 0,
+        processed: 0,
+        skipped: 0,
+        error: 0,
+        lastQueuedAt: "",
+        lastProcessedAt: "",
+      };
+      if (table.isNullObject) return empty;
+
+      const body = table.getDataBodyRange();
+      body.load("values");
+      const headerRow = table.getHeaderRowRange();
+      headerRow.load("values");
+      await ctx.sync();
+
+      const header = (headerRow.values && headerRow.values[0]) || [];
+      const idx = (name) =>
+        header.findIndex((h) => normalizeText(h) === normalizeText(name));
+      const iStatus = idx("Status");
+      const iQueued = idx("QueuedAt");
+      const iProc = idx("ProcessedAt");
+
+      const rows = body.values || [];
+      const out = Object.assign({}, empty, {
+        exists: true,
+        total: rows.length,
+      });
+      let lastQ = "",
+        lastP = "";
+      for (let i = 0; i < rows.length; i++) {
+        const status = normalizeText(rows[i][iStatus]);
+        if (status === "pending") out.pending++;
+        else if (status === "processed") out.processed++;
+        else if (status === "skipped") out.skipped++;
+        else if (status === "error") out.error++;
+        const q = String(rows[i][iQueued] || "");
+        const p = String(rows[i][iProc] || "");
+        if (q > lastQ) lastQ = q;
+        if (p > lastP) lastP = p;
+      }
+      out.lastQueuedAt = lastQ;
+      out.lastProcessedAt = lastP;
+      return out;
+    });
+  }
+
   async function saveNewClient(payload) {
     return Excel.run(async (ctx) => {
       const table = await ensureQueueTable(ctx);
@@ -443,6 +503,61 @@ const POD_BOOKING = (function () {
     });
   }
 
+  /**
+   * Centered modal popup shared by every task pane. Auto-dismisses success
+   * messages after ~2.5s; error messages stay until dismissed. Injects its
+   * own CSS once so individual HTML pages need no extra markup.
+   */
+  function showPopup(message, kind) {
+    try {
+      const styleId = "pb-popup-style";
+      if (!document.getElementById(styleId)) {
+        const st = document.createElement("style");
+        st.id = styleId;
+        st.textContent =
+          ".pb-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;z-index:99999;}" +
+          ".pb-pop{background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:20px 22px;max-width:300px;text-align:center;font-family:Segoe UI,Calibri,sans-serif;}" +
+          ".pb-pop .pb-icon{width:48px;height:48px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;}" +
+          ".pb-pop.success .pb-icon{background:#16a34a;}" +
+          ".pb-pop.error .pb-icon{background:#dc2626;}" +
+          ".pb-pop .pb-msg{font-size:14px;color:#1f2937;line-height:1.45;margin-bottom:14px;word-break:break-word;}" +
+          ".pb-pop button{border:0;border-radius:8px;background:#2563eb;color:#fff;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;}" +
+          ".pb-pop button:hover{background:#1d4ed8;}";
+        document.head.appendChild(st);
+      }
+      const isErr = kind === "error";
+      const overlay = document.createElement("div");
+      overlay.className = "pb-overlay";
+      const pop = document.createElement("div");
+      pop.className = "pb-pop " + (isErr ? "error" : "success");
+      const icon = document.createElement("div");
+      icon.className = "pb-icon";
+      icon.textContent = isErr ? "!" : "\u2713";
+      const msg = document.createElement("div");
+      msg.className = "pb-msg";
+      msg.textContent = message;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "OK";
+      pop.appendChild(icon);
+      pop.appendChild(msg);
+      pop.appendChild(btn);
+      overlay.appendChild(pop);
+      const close = () => {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      };
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) close();
+      });
+      btn.addEventListener("click", close);
+      document.body.appendChild(overlay);
+      if (!isErr) setTimeout(close, 2500);
+      return close;
+    } catch (e) {
+      /* non-fatal */
+    }
+  }
+
   return {
     getWorkbookContext,
     isPodWorkbook,
@@ -454,8 +569,10 @@ const POD_BOOKING = (function () {
     getClientListWithPOD,
     submitForm,
     saveNewClient,
+    getQueueStatus,
     appendTime,
     saveDateTime,
+    showPopup,
     diagnose,
   };
 })();
